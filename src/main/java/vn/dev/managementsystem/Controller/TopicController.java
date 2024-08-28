@@ -4,11 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.dev.managementsystem.Dto.GetDBody;
 import vn.dev.managementsystem.Dto.TopicAttachmentDto;
 import vn.dev.managementsystem.Dto.TopicDto;
 import vn.dev.managementsystem.Entity.*;
+import vn.dev.managementsystem.Repository.GroupRepository;
+import vn.dev.managementsystem.Repository.TopicRepository;
 import vn.dev.managementsystem.Service.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @CrossOrigin(origins = "*")
@@ -22,6 +27,12 @@ public class TopicController {
     private CloudinaryService cloudinaryService;
     @Autowired
     private TopicService topicService;
+
+    @Autowired
+    private TopicRepository topicRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     @Autowired
     private UserService userService;
@@ -390,14 +401,35 @@ public class TopicController {
             Map<String, Object> jsonResult = new HashMap<>();
             Group g = groupService.saveUpdateGroup(topicId, group);
             if (g == null) {
-                jsonResult.put("Topic not found", "704");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResult);
+                return BaseResponse.<String>builder().code(HttpStatus.NOT_FOUND.value()).message("Group not found").data(null).build().toResponse();
             }
-            jsonResult.put("Successfully", g);
-            return ResponseEntity.ok(jsonResult);
+            return BaseResponse.<Group>builder().code(HttpStatus.OK.value()).message("Success").data(g).build().toResponse();
+
         } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.<String>builder().code(HttpStatus.INTERNAL_SERVER_ERROR.value()).message("Internal server error").data(null).build().toResponse();
         }
     }
+
+    @PostMapping("/council/set-protect-time/{topicId}")
+    public ResponseEntity<Map<String, Object>> setProtectTime(@PathVariable Integer topicId,
+                                                              @RequestBody GetDBody date) throws ParseException {
+        Map<String, Object> jsonResult = new HashMap<>();
+
+        try {
+            Group g = groupService.setProtectTime(topicId, date);
+            //        Date g = groupService.setProtectTime(topicId, date);
+            if (g == null){
+                jsonResult.put("Topic not found", "704");
+                return BaseResponse.<String>builder().code(HttpStatus.NOT_FOUND.value()).message("Topic not found").data(null).build().toResponse();
+            }
+            return BaseResponse.<Group>builder().code(HttpStatus.OK.value()).message("Successfully").data(g).build().toResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.<String>builder().code(HttpStatus.INTERNAL_SERVER_ERROR.value()).message("Internal server error").data(null).build().toResponse();
+        }
+
+    }
+
 }

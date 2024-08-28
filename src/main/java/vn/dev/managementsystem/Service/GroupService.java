@@ -2,12 +2,16 @@ package vn.dev.managementsystem.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.dev.managementsystem.Dto.GetDBody;
 import vn.dev.managementsystem.Entity.Group;
 import vn.dev.managementsystem.Entity.Topic;
 import vn.dev.managementsystem.Repository.GroupRepository;
 import vn.dev.managementsystem.Repository.TopicRepository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 public class GroupService {
@@ -51,5 +55,16 @@ public class GroupService {
         entity.setLecturer4Email(g.getLecturer4Email() != null ? g.getLecturer4Email() : entity.getLecturer4Email());
         entity.setLecturer5Email(g.getLecturer5Email() != null ? g.getLecturer5Email() : entity.getLecturer5Email());
         return groupRepository.save(entity);
+    }
+
+    public Group setProtectTime(Integer topicId, GetDBody _date) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date parseDate = sdf.parse(_date.getDate());
+        //        String date = sdf.format(parseDate);
+        //        System.out.println("DATE EEEEEEEE == " + date);
+        Group entity = Objects.requireNonNull(topicRepository.findById(topicId).orElse(null)).getCouncil();
+        entity.setProtectTime(parseDate);
+        groupRepository.save(entity);
+        return entity;
     }
 }
