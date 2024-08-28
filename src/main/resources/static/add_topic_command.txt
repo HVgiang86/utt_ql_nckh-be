@@ -1,0 +1,11 @@
+ALTER TABLE `databasems_2207`.`tbl_topic` 
+DROP FOREIGN KEY `FK6ak511fe4ynadk8m7ju5dh24q`;
+ALTER TABLE `databasems_2207`.`tbl_topic` 
+CHANGE COLUMN `field` `field` LONGTEXT NOT NULL ,
+CHANGE COLUMN `idea` `idea` LONGTEXT ,
+CHANGE COLUMN `purpose` `purpose` LONGTEXT ,
+CHANGE COLUMN `lecturer_id` `lecturer_id` INT NOT NULL ;
+ALTER TABLE `databasems_2207`.`tbl_topic` 
+ADD CONSTRAINT `FK6ak511fe4ynadk8m7ju5dh24q`
+  FOREIGN KEY (`lecturer_id`)
+  REFERENCES `databasems_2207`.`tbl_user` (`id`);
